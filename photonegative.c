@@ -172,7 +172,7 @@ gegl_op_class_init (GeglOpClass *klass)
 
   gegl_operation_class_set_keys (operation_class,
                                  "title",         "Photographic Negative",
-                                 "name",          "cs:posinegative",
+                                 "name",          "cs:photonegative",
                                  "description",   _("Simulate a photographic color negative with orange mask and film contrast. "
                                                      "Models the characteristic density curve and orange base mask of C-41 "
                                                      "color negative film.  When 'Preserve Hue' is enabled, only the luminance "

@@ -1,3 +1,5 @@
+![image info](./screenshot.png)
+
 To build on Windows use MSYS with MINGW/GCC and MESON installed:
 ```
 pacman -Syu
