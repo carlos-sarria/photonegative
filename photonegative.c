@@ -8,15 +8,22 @@ property_boolean (preserve_hue, _("Preserve Hue"), FALSE)
     description   (_("When enabled, preserves the original hue of each pixel and inverts only the luminance. "
                      "The orange mask is disabled in this mode."))
 
+property_int (hue_cutoff, _("Hue Cutoff"), 10)
+    value_range (0, 20)
+    description   (_("Cutoff value to preserve the original hue or replacing it by luminance."))
+    ui_meta ("visible", " preserve_hue")
+
 property_double (mask_strength, _("Orange Mask"), 1.0)
     value_range (0.0, 2.0)
     description   (_("Strength of the orange/amber mask characteristic of color negative film. Set to 0 for no mask. "
                      "Only applies when Preserve Hue is disabled."))
+    ui_meta ("visible", "! preserve_hue")
 
 property_double (crossover, _("Color Crossover"), 0.15)
     value_range (0.0, 0.5)
     description   (_("Per-channel contrast variation to simulate real film emulsion layers. Higher values give more color crossover. "
                      "Only applies when Preserve Hue is disabled."))
+    ui_meta ("visible", "! preserve_hue")
 
 #else
 
@@ -53,7 +60,8 @@ process (GeglOperation       *op,
     gfloat film_contrast = GEGL_PROPERTIES (op)->film_contrast;
     gboolean preserve_hue_flag = GEGL_PROPERTIES (op)->preserve_hue;
     gfloat mask_strength = GEGL_PROPERTIES (op)->mask_strength;
-    gfloat crossover     = GEGL_PROPERTIES (op)->crossover;
+    gfloat crossover = GEGL_PROPERTIES (op)->crossover;
+    gint hue_cutoff = GEGL_PROPERTIES (op)->hue_cutoff;
 
     /*
      * Orange mask — the characteristic orange/amber base of C-41 film.
@@ -107,9 +115,9 @@ process (GeglOperation       *op,
             if (Y > epsilon)
             {
                 float scale = Y_inv / Y;
-                out_pixel[0] = scale * r;
-                out_pixel[1] = scale * g;
-                out_pixel[2] = scale * b;
+                out_pixel[0] = (scale<hue_cutoff) ? scale * r : Y_inv;
+                out_pixel[1] = (scale<hue_cutoff) ? scale * g : Y_inv;
+                out_pixel[2] = (scale<hue_cutoff) ? scale * b : Y_inv;
             }
             else
             {
